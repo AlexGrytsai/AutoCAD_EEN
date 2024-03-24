@@ -1,4 +1,4 @@
 .venv
-/app/services/project_info/__init__.py
 /app/services/__init__.py
 /app/__init__.py
+app/files
