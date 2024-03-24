@@ -1,5 +1,5 @@
 # AutoCAD External engineering networks
-
+from pyautocad import Autocad, APoint
 
 property_info = {"Назва об'єкту": "PROJECT NAME",
                  "Розділ проекту": "PROJECT TITLE NETWORK",
@@ -17,4 +17,5 @@ property_info = {"Назва об'єкту": "PROJECT NAME",
 
                  }
 if __name__ == '__main__':
-    pass
+    acad = Autocad(create_if_not_exists=True, visible=True)
+    APoint(0, 0)
