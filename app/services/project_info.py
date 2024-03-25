@@ -4,6 +4,22 @@ from app.autocad import Autocad
 class ProjectInfo:
     acad = Autocad()
 
+    property_template = {
+        "Назва об'єкту": "PROJECT NAME",
+        "Розділ проекту": "Зовнішні мережі водопостачання та каналізації",
+        "Стадія проектування": "Р",
+        "ТУ В1": "00000",
+        "ТУ К1": "11111",
+        "ТУ К2": "22222",
+        "Проектна організація": "ФОП Столярчук О.В.",
+        "ГІП": "Столярчук",
+        "Розробив": "Грицай",
+        "Замовник": "CUSTOMER NAME",
+        "Представник Водоканалу": "SIGNATORY PROJECT",
+        "Посада представника": "JOB TITLE SIGNATORY",
+        "ID Проекту": "PROJECT ID",
+    }
+
     def get_all_project_info(self) -> dict:
         all_projects = {}
         for i in range(self.acad.si.NumCustomInfo()):
@@ -43,19 +59,33 @@ class ProjectInfo:
         self.acad.doc.SummaryInfo.SetCustomByKey(key, value)
 
     def make_template_user_property(self) -> None:
-        property_template = {
-            "Назва об'єкту": "PROJECT NAME",
-            "Розділ проекту": "PROJECT TITLE NETWORK",
-            "Стадія проектування": "STAGE PROJECT",
-            "ТУ В1": "NUMBER TR WATER",
-            "ТУ К1": "NUMBER OF TR SIGNATORY",
-            "ТУ К2": "NUMBER OF TR RAIN SEWERAGE",
-            "Проектна організація": "AUTHOR PROJECT",
-            "ГІП": "CHIEF PROJECT ENGINEER",
-            "Розробив": "NAME DESIGNER",
-            "Замовник": "CUSTOMER NAME",
-            "Представник Водоканалу": "SIGNATORY PROJECT",
-            "Посада представника": "JOB TITLE SIGNATORY",
-            "ID Проекту": "PROJECT ID",
-        }
-        self.write_all_property(**property_template)
+        self.write_all_property(**self.property_template)
+
+
+class ProjectInfoMaker(ProjectInfo):
+
+    def take_project_info(self) -> None:
+        print("\033[1mВам необхідно додати необхідну інформацію до проекту.\n"
+              "Ці дані будуть збереженні у властивостях файлів .dwg\033[0m\n")
+        for key in self.property_template:
+            print(f"Введіть: \033[1;31m{key}\033[0m\n"
+                  f"(за замовчуванням: \033[1;31m{self.property_template[key]}\033[0m)")
+            value = input("Введіть значення або натисніть Enter: ")
+            print()
+            if value:
+                self.property_template[key] = value
+        for key, value in self.property_template.items():
+            print(f"\033[1m{key}\033[0m: {value}")
+
+    def take_manual_user_property(self) -> None:
+        pass
+
+    def make_template_project_info(
+            self,
+            project_files_path: list[str]
+    ) -> None:
+        for file_path in project_files_path:
+            self.acad.open_dwg(file_path)
+            self.make_template_user_property()
+            self.acad.close_and_save_dwg(file_path)
+        self.acad.close_acad()
