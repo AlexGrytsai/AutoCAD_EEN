@@ -89,8 +89,29 @@ class Project:
 
         copytree(path_to_template, path_to_project, dirs_exist_ok=True)
 
-    def rename_file_dwg(self) -> None:
-        pass
+        self.rename_file_dwg(path_to_project)
+
+    @staticmethod
+    def path_to_all_dwg_project_files(path_to_project: str) -> list:
+        dwg_files = []
+        for root, dirs, files in os.walk(path_to_project):
+            for file in files:
+                if file.endswith(".dwg"):
+                    dwg_files.append(os.path.join(root, file))
+        return dwg_files
+
+    def rename_file_dwg(self, path_to_project: str) -> None:
+        dwg_files = self.path_to_all_dwg_project_files(path_to_project)
+        for dwg_file in dwg_files:
+            directory, filename = os.path.split(dwg_file)
+            new_file_name = filename.split("_")
+            new_file_name[0] = self.short_name
+            new_file_name = "_".join(new_file_name)
+
+            old_file_path = os.path.join(directory, filename)
+            new_file_path = os.path.join(directory, new_file_name)
+
+            os.rename(old_file_path, new_file_path)
 
     def take_project_info(self) -> None:
         print("\033[1mВам необхідно додати необхідну інформацію до проекту.\n"

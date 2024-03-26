@@ -42,11 +42,13 @@ class ProjectApp(App):
             print(f"[{key}] {value.title()}")
         print("-" * 48)
 
-    def create_new_project(self):
+    @staticmethod
+    def create_new_project():
         short_name = input("\033[1mВведіть коротку назву:\033[0m ").lower()
 
         project = Project(short_name)
         project.create_project_folder_with_template()
+        #TODO: нужно написать выбор по заполнению свойств
 
     def user_action(self):
         self.print_start_massage()
