@@ -24,6 +24,6 @@ class Autocad:
         self.acad.Quit()
 
 
-Autocad().open_dwg("D:\\Python\\MY PROJECTS\\AutoCAD_EEN\\Чертеж4.dwg")
-Autocad().close_and_save_dwg("D:\\Python\\MY PROJECTS\\AutoCAD_EEN\\Чертеж4.dwg")
-Autocad().close_acad()
+# Autocad().open_dwg("D:\\Python\\MY PROJECTS\\AutoCAD_EEN\\Чертеж4.dwg")
+# Autocad().close_and_save_dwg("D:\\Python\\MY PROJECTS\\AutoCAD_EEN\\Чертеж4.dwg")
+# Autocad().close_acad()
