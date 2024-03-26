@@ -1,20 +1,14 @@
 import os
 from shutil import copytree
-from app.autocad import Autocad
 
-from tkinter.filedialog import askdirectory
+import easygui
+
+from app.autocad import Autocad
 
 
 class Project:
     acad = Autocad()
-    pass
 
-    # def __init__(self, short_name: str, path_to_project: str) -> None:
-    #     self.short_name = short_name
-    #     self.path_to_project = path_to_project
-
-
-class ProjectInfo(Project):
     property_template = {
         "Назва об'єкту": "PROJECT NAME",
         "Розділ проекту": "Зовнішні мережі водопостачання та каналізації",
@@ -30,6 +24,9 @@ class ProjectInfo(Project):
         "Посада представника": "JOB TITLE SIGNATORY",
         "ID Проекту": "PROJECT ID",
     }
+
+    def __init__(self, short_name: str) -> None:
+        self.short_name = short_name
 
     def get_all_project_info(self) -> dict:
         all_projects = {}
@@ -72,10 +69,7 @@ class ProjectInfo(Project):
     def make_template_user_property(self) -> None:
         self.write_all_property(**self.property_template)
 
-
-class ProjectInfoMaker(ProjectInfo):
-
-    def create_project(self) -> None:
+    def create_project_folder_with_template(self) -> None:
         app_directory = os.path.dirname(
             os.path.dirname(
                 os.path.abspath(__file__)
@@ -85,11 +79,18 @@ class ProjectInfoMaker(ProjectInfo):
             app_directory,
             "files", "dwg_template", "project_water_sewerage"
         )
+        self.short_name = self.short_name.title()
 
-        path_to_dir = askdirectory(title="Виберіть місце для нового проекту")
+        path_to_project = easygui.diropenbox(
+            title="Виберіть місце для нового проекту"
+        )
 
-        copytree(path_to_template, path_to_dir, dirs_exist_ok=True)
-        # TODO: need add dir with short name project
+        path_to_project = os.path.join(path_to_project, self.short_name)
+
+        copytree(path_to_template, path_to_project, dirs_exist_ok=True)
+
+    def rename_file_dwg(self) -> None:
+        pass
 
     def take_project_info(self) -> None:
         print("\033[1mВам необхідно додати необхідну інформацію до проекту.\n"
@@ -117,6 +118,3 @@ class ProjectInfoMaker(ProjectInfo):
             self.make_template_user_property()
             self.acad.close_and_save_dwg(file_path)
         self.acad.close_acad()
-
-
-ProjectInfoMaker().create_project()
