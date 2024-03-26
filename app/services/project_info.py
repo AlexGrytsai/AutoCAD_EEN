@@ -1,5 +1,6 @@
 import os
 from shutil import copytree
+from typing import List
 
 import easygui
 
@@ -25,7 +26,8 @@ class Project:
         "ID Проекту": "PROJECT ID",
     }
 
-    def __init__(self, short_name: str) -> None:
+    def __init__(self, short_name: str | None = None) -> None:
+        self.path_to_project = None
         self.short_name = short_name
 
     def get_all_project_info(self) -> dict:
@@ -51,6 +53,17 @@ class Project:
                 self.write_user_property(key, value)
             else:
                 self.update_property_value(key, value)
+
+    def write_template_project_info(
+            self,
+            project_files_path: list[str]
+    ) -> None:
+        for file_path in project_files_path:
+            self.acad.open_dwg(file_path)
+            self.make_template_user_property()
+            print(self.acad.doc.Name)
+            # self.acad.close_and_save_dwg(file_path)
+        # self.acad.close_acad()
 
     def remove_property(self, property_name: str) -> None:
         self.acad.doc.SummaryInfo.RemoveCustomByKey(property_name)
@@ -85,15 +98,15 @@ class Project:
             title="Виберіть місце для нового проекту"
         )
 
-        path_to_project = os.path.join(path_to_project, self.short_name)
+        self.path_to_project = os.path.join(path_to_project, self.short_name)
 
-        copytree(path_to_template, path_to_project, dirs_exist_ok=True)
+        copytree(path_to_template, self.path_to_project, dirs_exist_ok=True)
 
         self.rename_file_dwg(path_to_project)
 
     @staticmethod
     def path_to_all_dwg_project_files(path_to_project: str) -> list:
-        dwg_files = []
+        dwg_files: list[str] = []
         for root, dirs, files in os.walk(path_to_project):
             for file in files:
                 if file.endswith(".dwg"):
@@ -129,13 +142,3 @@ class Project:
 
     def take_manual_user_property(self) -> None:
         pass
-
-    def make_template_project_info(
-            self,
-            project_files_path: list[str]
-    ) -> None:
-        for file_path in project_files_path:
-            self.acad.open_dwg(file_path)
-            self.make_template_user_property()
-            self.acad.close_and_save_dwg(file_path)
-        self.acad.close_acad()

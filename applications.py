@@ -6,10 +6,6 @@ class App:
 
 
 class ProjectApp(App):
-    commands = {
-        "1": "створити",
-        "0": "exit",
-    }
 
     @staticmethod
     def print_start_massage() -> None:
@@ -34,37 +30,69 @@ class ProjectApp(App):
               "(повна назва, № ТУ і таке інше)\n")
         print("[0]. \033[1mEXIT\033[0m\n")
 
-    def print_error_massage_wrong_command(self):
+    @staticmethod
+    def print_error_massage_wrong_command(commands: dict) -> None:
         print("-" * 48)
         print("\033[1;31mВи ввели не коректну команду. "
               "Допустимі команди:\033[0m")
-        for key, value in self.commands.items():
+        for key, value in commands.items():
             print(f"[{key}] {value.title()}")
         print("-" * 48)
 
     @staticmethod
-    def create_new_project():
+    def create_command_list(commands: dict) -> list:
+        return ([key for key, value in commands.items()]
+                + [value for key, value in commands.items()])
+
+    def create_new_project(self):
         short_name = input("\033[1mВведіть коротку назву:\033[0m ").lower()
 
         project = Project(short_name)
         project.create_project_folder_with_template()
-        #TODO: нужно написать выбор по заполнению свойств
+
+        commands = {
+            "0": "так",
+            "1": "ні",
+        }
+
+        print("-" * 48)
+        print("Заповнити дані проекту:\n"
+              "[0] Так\n"
+              "[1] Ні (можна буде заповнити пізніше)")
+        command = input("\033[1mВведіть команду:\033[0m ").lower()
+        while True:
+            if command not in self.create_command_list(commands):
+                self.print_error_massage_wrong_command(commands)
+            if command in ("0", "так"):
+                pass
+            if command in ("1", "ні"):
+                print(project.path_to_project)
+                dwg_files = project.path_to_all_dwg_project_files(
+                    project.path_to_project
+                )
+                project.write_template_project_info(dwg_files)
+                break
+        # TODO: нужно написать выбор по заполнению свойств
 
     def user_action(self):
         self.print_start_massage()
 
+        commands = {
+            "1": "створити",
+            "0": "exit",
+        }
+
         while True:
-            commands_list = ([key for key, value in self.commands.items()]
-                             + [value for key, value in self.commands.items()])
             command = input("\033[1mВведіть команду:\033[0m ").lower()
-            if command not in commands_list:
-                self.print_error_massage_wrong_command()
+            if command not in self.create_command_list(commands):
+                self.print_error_massage_wrong_command(commands)
 
-            if command == "1" or command == "створити":
+            if command in ("1", "створити"):
                 self.create_new_project()
+                break
 
-            if command == "0" or command == "exit":
+            if command in ("0", "exit"):
                 break
 
 
-ProjectApp()
+ProjectApp().user_action()
