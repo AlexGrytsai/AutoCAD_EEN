@@ -1,6 +1,5 @@
 import os
 from shutil import copytree
-from typing import List
 
 import easygui
 
@@ -38,48 +37,50 @@ class Project:
             all_projects[key] = value
         return all_projects
 
-    def get_project_info_by_key(self, key: str) -> str | bool:
-        try:
-            return self.acad.si.GetCustomByKey(key)
-        except Exception:
-            return False
+    # TODO: Нужно переписать - перенести в Автокад и сделать для выбраного файла
 
     def write_user_property(self, key: str, value: str) -> None:
-        self.acad.doc.SummaryInfo.AddCustomInfo(key, value)
+        opened_drawings = [drawing for drawing in self.acad.docs]
+        for drawing in opened_drawings:
+            self.acad.add_user_property_to_drawing(drawing, key, value)
 
     def write_all_property(self, **kwargs) -> None:
-        for key, value in kwargs.items():
-            if not self.get_project_info_by_key(key):
-                self.write_user_property(key, value)
-            else:
-                self.update_property_value(key, value)
+        opened_drawings = [drawing for drawing in self.acad.docs]
+        del opened_drawings[0]
+        for drawing in opened_drawings:
+            for key, value in kwargs.items():
+                self.acad.add_user_property_to_drawing(
+                    drawing=drawing,
+                    key=key,
+                    value=value
+                )
+            self.acad.quick_save_dwg(drawing)
+        while opened_drawings:
+            drawing = opened_drawings.pop()
+            self.acad.close_dwg(drawing)
 
     def write_template_project_info(
             self,
             project_files_path: list[str]
     ) -> None:
         for file_path in project_files_path:
-            self.acad.open_dwg(file_path)
-            self.make_template_user_property()
-            print(self.acad.doc.Name)
-            # self.acad.close_and_save_dwg(file_path)
-        # self.acad.close_acad()
+            opened_files = [doc.FullName for doc in self.acad.docs]
+            if file_path not in opened_files:
+                self.acad.open_dwg(file_path)
+        self.write_template_user_property()
 
     def remove_property(self, property_name: str) -> None:
         self.acad.doc.SummaryInfo.RemoveCustomByKey(property_name)
+
+    # TODO: Нужно чтобы открывались все чертежи проекта и из них удалялось свойство
 
     def remove_all_property(self) -> None:
         for _ in range(self.acad.doc.SummaryInfo.NumCustomInfo()):
             self.acad.doc.SummaryInfo.RemoveCustomByIndex(0)
 
-    def update_property_value(
-            self,
-            key: str,
-            value: str
-    ) -> None:
-        self.acad.doc.SummaryInfo.SetCustomByKey(key, value)
+    # TODO: Нужно чтобы открывались все чертежи проекта и из них удалялось свойство
 
-    def make_template_user_property(self) -> None:
+    def write_template_user_property(self) -> None:
         self.write_all_property(**self.property_template)
 
     def create_project_folder_with_template(self) -> None:
@@ -102,7 +103,7 @@ class Project:
 
         copytree(path_to_template, self.path_to_project, dirs_exist_ok=True)
 
-        self.rename_file_dwg(path_to_project)
+        self.rename_file_dwg_for_new_project(path_to_project)
 
     @staticmethod
     def path_to_all_dwg_project_files(path_to_project: str) -> list:
@@ -113,7 +114,7 @@ class Project:
                     dwg_files.append(os.path.join(root, file))
         return dwg_files
 
-    def rename_file_dwg(self, path_to_project: str) -> None:
+    def rename_file_dwg_for_new_project(self, path_to_project: str) -> None:
         dwg_files = self.path_to_all_dwg_project_files(path_to_project)
         for dwg_file in dwg_files:
             directory, filename = os.path.split(dwg_file)
@@ -126,7 +127,7 @@ class Project:
 
             os.rename(old_file_path, new_file_path)
 
-    def take_project_info(self) -> None:
+    def take_from_user_project_info(self) -> None:
         print("\033[1mВам необхідно додати необхідну інформацію до проекту.\n"
               "Ці дані будуть збереженні у властивостях файлів .dwg\033[0m\n")
         for key in self.property_template:
@@ -139,6 +140,3 @@ class Project:
                 self.property_template[key] = value
         for key, value in self.property_template.items():
             print(f"\033[1m{key}\033[0m: {value}")
-
-    def take_manual_user_property(self) -> None:
-        pass

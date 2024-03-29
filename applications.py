@@ -66,7 +66,6 @@ class ProjectApp(App):
             if command in ("0", "так"):
                 pass
             if command in ("1", "ні"):
-                print(project.path_to_project)
                 dwg_files = project.path_to_all_dwg_project_files(
                     project.path_to_project
                 )
@@ -95,4 +94,4 @@ class ProjectApp(App):
                 break
 
 
-ProjectApp().user_action()
+# ProjectApp().user_action()
