@@ -37,7 +37,8 @@ class Project:
             all_projects[key] = value
         return all_projects
 
-    # TODO: Нужно переписать - перенести в Автокад и сделать для выбраного файла
+    # TODO: Нужно переписать - перенести в Автокад
+    #  и сделать для выбраного файла
 
     def write_user_property(self, key: str, value: str) -> None:
         opened_drawings = [drawing for drawing in self.acad.docs]
@@ -72,13 +73,15 @@ class Project:
     def remove_property(self, property_name: str) -> None:
         self.acad.doc.SummaryInfo.RemoveCustomByKey(property_name)
 
-    # TODO: Нужно чтобы открывались все чертежи проекта и из них удалялось свойство
+    # TODO: Нужно чтобы открывались все чертежи проекта
+    #  и из них удалялось свойство
 
     def remove_all_property(self) -> None:
         for _ in range(self.acad.doc.SummaryInfo.NumCustomInfo()):
             self.acad.doc.SummaryInfo.RemoveCustomByIndex(0)
 
-    # TODO: Нужно чтобы открывались все чертежи проекта и из них удалялось свойство
+    # TODO: Нужно чтобы открывались все чертежи проекта и из них
+    #  удалялось свойство
 
     def write_template_user_property(self) -> None:
         self.write_all_property(**self.property_template)
@@ -126,6 +129,10 @@ class Project:
             new_file_path = os.path.join(directory, new_file_name)
 
             os.rename(old_file_path, new_file_path)
+
+    @staticmethod
+    def open_project_folder(path_to_project: str) -> None:
+        os.startfile(path_to_project)
 
     def take_from_user_project_info(self) -> None:
         print("\033[1mВам необхідно додати необхідну інформацію до проекту.\n"

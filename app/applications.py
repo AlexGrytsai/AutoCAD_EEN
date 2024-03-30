@@ -30,19 +30,22 @@ class ProjectApp(App):
               "(повна назва, № ТУ і таке інше)\n")
         print("[0]. \033[1mEXIT\033[0m\n")
 
-    @staticmethod
-    def print_error_massage_wrong_command(commands: dict) -> None:
+    def print_error_massage_wrong_command(self, commands: dict) -> None:
         print("-" * 48)
         print("\033[1;31mВи ввели не коректну команду. "
               "Допустимі команди:\033[0m")
-        for key, value in commands.items():
-            print(f"[{key}] {value.title()}")
+        self.create_command_menu(commands)
         print("-" * 48)
 
     @staticmethod
     def create_command_list(commands: dict) -> list:
         return ([key for key, value in commands.items()]
                 + [value for key, value in commands.items()])
+
+    @staticmethod
+    def create_command_menu(commands: dict) -> None:
+        for key, value in commands.items():
+            print(f"\033[1m[{key}]:\033[0m {value.title()}")
 
     def create_new_project(self):
         short_name = input("\033[1mВведіть коротку назву:\033[0m ").lower()
@@ -56,22 +59,27 @@ class ProjectApp(App):
         }
 
         print("-" * 48)
-        print("Заповнити дані проекту:\n"
-              "[0] Так\n"
-              "[1] Ні (можна буде заповнити пізніше)")
+        print("Заповнити дані проекту?")
+        self.create_command_menu(commands)
         command = input("\033[1mВведіть команду:\033[0m ").lower()
         while True:
             if command not in self.create_command_list(commands):
-                self.print_error_massage_wrong_command(commands)
+                while True:
+                    self.print_error_massage_wrong_command(commands)
+                    command = input("\033[1mВведіть команду:\033[0m ").lower()
+                    if command in self.create_command_list(commands):
+                        break
             if command in ("0", "так"):
-                pass
-            if command in ("1", "ні"):
-                dwg_files = project.path_to_all_dwg_project_files(
-                    project.path_to_project
-                )
-                project.write_template_project_info(dwg_files)
-                break
-        # TODO: нужно написать выбор по заполнению свойств
+                project.take_from_user_project_info()
+            dwg_files = project.path_to_all_dwg_project_files(
+                project.path_to_project
+            )
+
+            print("Зачекайте, створюється проект. Це може зайняти 1-2хв.")
+
+            project.write_template_project_info(dwg_files)
+            project.open_project_folder(project.path_to_project)
+            break
 
     def user_action(self):
         self.print_start_massage()
@@ -92,6 +100,3 @@ class ProjectApp(App):
 
             if command in ("0", "exit"):
                 break
-
-
-# ProjectApp().user_action()

@@ -15,9 +15,6 @@ class Autocad:
         else:
             self.acad.Documents.Open(address_file)
 
-    @staticmethod
-    def esc_command(drawing: CDispatch) -> None:
-        drawing.PostCommand("_commandline")
 
     @staticmethod
     def quick_save_dwg(drawing: CDispatch) -> None:
@@ -60,7 +57,7 @@ class Autocad:
             self.update_user_property_drawing_value(drawing, key, value)
 
     @staticmethod
-    def remove_user_property(
+    def remove_user_property_from_drawing(
             drawing: CDispatch,
             property_name: str
     ) -> None:
