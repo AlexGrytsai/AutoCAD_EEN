@@ -5,7 +5,7 @@ class App:
     pass
 
 
-class ProjectApp(App):
+class AppTerminal(App):
 
     @staticmethod
     def print_start_massage() -> None:

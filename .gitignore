@@ -1,4 +1,6 @@
 .venv
 /app/services/__init__.py
 /app/__init__.py
+app/gui/__init__.py
 app/files
+
