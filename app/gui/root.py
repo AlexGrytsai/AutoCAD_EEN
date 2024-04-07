@@ -11,7 +11,7 @@ class AppGUI:
         self.root.geometry("600x200")
 
         self.frame_with_actions()
-        self.frame_with_project_property()
+        # self.frame_with_project_property()
 
         self.project = None
 
