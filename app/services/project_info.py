@@ -7,8 +7,6 @@ from app.autocad import Autocad
 
 
 class Project:
-    acad = Autocad()
-
     property_template = {
         "Назва об'єкту": "PROJECT NAME",
         "Розділ проекту": "Зовнішні мережі водопостачання та каналізації",
@@ -26,6 +24,7 @@ class Project:
     }
 
     def __init__(self, short_name: str | None = None) -> None:
+        self.acad = Autocad()
         self.path_to_project = None
         self.short_name = short_name
 
@@ -86,7 +85,15 @@ class Project:
     def write_template_user_property(self) -> None:
         self.write_all_property(**self.property_template)
 
-    def create_project_folder_with_template(self) -> None:
+    @staticmethod
+    def choose_path_for_project() -> str:
+        return easygui.diropenbox(title="Виберіть місце для нового проекту")
+
+    def create_project_folder_with_template(
+            self,
+            path_to_project: str | None = None
+    ) -> None:
+
         app_directory = os.path.dirname(
             os.path.dirname(
                 os.path.abspath(__file__)
@@ -98,10 +105,10 @@ class Project:
         )
         self.short_name = self.short_name.title()
 
-        path_to_project = easygui.diropenbox(
-            title="Виберіть місце для нового проекту"
-        )
-
+        if self.path_to_project is None:
+            path_to_project = easygui.diropenbox(
+                title="Виберіть місце для нового проекту"
+            )
         self.path_to_project = os.path.join(path_to_project, self.short_name)
 
         copytree(path_to_template, self.path_to_project, dirs_exist_ok=True)
