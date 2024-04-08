@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 
 from app.services.project_info import Project
 
@@ -136,8 +137,42 @@ class CreateProjectGUI:
         if entry.get() in template_list_property:
             entry.delete(0, tk.END)
 
+    def get_all_user_properties(self) -> None:
+        user_properties = {}
+        for property in self.key_value_properties:
+            key, value = property
+            user_properties[key.get()] = value.get()
+        self.project.property_template = user_properties
+
+    def check_required_fields(self) -> bool:
+        if self.short_name_project.get() and self.path_to_folder.get():
+            return True
+        return False
+
     def create_new_project(self) -> None:
-        if self.short_name_project:
+        if self.check_required_fields():
+            # messagebox.showinfo(title="Create the new project",
+            #                     message="Створюється новий проект.\n"
+            #                             "Це може зайняти декілька хвилин.\n"
+            #                             "!!Не вимикайте комп'ютер та зупиняйте"
+            #                             " программу!!")
+
             self.project.short_name = self.short_name_project.get()
-            print(self.project.short_name)
-        #TODO: Нужно сделать проверки, что бы было заполнены шорт имя и выбран путь
+
+            self.get_all_user_properties()
+
+            self.project.create_project_folder_with_template(
+                self.path_to_folder.get()
+            )
+
+            dwg_files = self.project.path_to_all_dwg_project_files(
+                self.project.path_to_project
+            )
+            self.project.write_template_project_info(dwg_files)
+
+            self.project.open_project_folder(self.project.path_to_project)
+        else:
+            messagebox.showwarning(
+                title="Помилка",
+                message="Необхідно заповнити всі обов'язкові поля"
+            )

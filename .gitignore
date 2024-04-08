@@ -3,4 +3,4 @@
 /app/__init__.py
 app/gui/__init__.py
 app/files
-
+!/app/gui/__init__.py

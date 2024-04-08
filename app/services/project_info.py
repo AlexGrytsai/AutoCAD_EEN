@@ -103,9 +103,9 @@ class Project:
             app_directory,
             "files", "dwg_template", "project_water_sewerage"
         )
-        self.short_name = self.short_name.title()
+        self.short_name = self.short_name.lower().title()
 
-        if self.path_to_project is None:
+        if path_to_project is None:
             path_to_project = easygui.diropenbox(
                 title="Виберіть місце для нового проекту"
             )
