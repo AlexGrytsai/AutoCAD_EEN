@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 
 from app.services.project_info import Project
@@ -10,12 +11,16 @@ class CreateProjectGUI:
 
         self.add_name_project_window = tk.Toplevel(root)
         self.add_name_project_window.title("Введіть дані об'єкта")
-        self.add_name_project_window.geometry("400x250")
+
+        icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
+        self.add_name_project_window.iconphoto(False, icon)
 
         self.short_name_project = self.create_fill_short_name()
         self.path_to_folder = self.create_fill_path_for_project()
 
         self.key_value_properties = self.create_fill_for_properties()
+
+        self.add_name_project_window.update_idletasks()
 
     def create_fill_short_name(self) -> tk.Entry:
         tk.Label(
@@ -37,10 +42,6 @@ class CreateProjectGUI:
         return short_name_entry_widget
 
     def create_fill_path_for_project(self) -> tk.Entry:
-        tk.Label(
-            self.add_name_project_window,
-            text="Місце розташування"
-        ).grid(row=1, column=0)
 
         path_to_folder_project_var = tk.StringVar()
 
@@ -57,11 +58,11 @@ class CreateProjectGUI:
             path_to_folder = self.project.choose_path_for_project()
             path_to_folder_project.insert(0, path_to_folder)
 
-        tk.Button(
+        ttk.Button(
             self.add_name_project_window,
             text="Вибрати",
             command=get_path_to_folder
-        ).grid(row=1, column=2)
+        ).grid(row=1, column=0, padx=5, pady=5)
 
         return path_to_folder_project
 
@@ -97,8 +98,8 @@ class CreateProjectGUI:
                 (entry_key_property, entry_value_property)
             )
 
-            entry_key_property.grid(row=i + 2, column=0)
-            entry_value_property.grid(row=i + 2, column=1)
+            entry_key_property.grid(row=i + 2, column=0, padx=5, pady=5)
+            entry_value_property.grid(row=i + 2, column=1, padx=5, pady=5)
 
             entry_key_property.bind(
                 "<FocusIn>",
@@ -121,11 +122,11 @@ class CreateProjectGUI:
 
             entry_key_property.configure(state="disabled")
 
-        tk.Button(
+        ttk.Button(
             self.add_name_project_window,
             text="Створити",
             command=self.create_new_project
-        ).grid(row=30, column=1)
+        ).grid(row=30, column=0, columnspan=2, padx=10, pady=10)
 
         return entry_key_value_properties
 
@@ -156,6 +157,7 @@ class CreateProjectGUI:
             #                             "Це може зайняти декілька хвилин.\n"
             #                             "!!Не вимикайте комп'ютер та зупиняйте"
             #                             " программу!!")
+            # TODO: Need to make simple window with message about create the new project. This window must be destroy after finished create
 
             self.project.short_name = self.short_name_project.get()
 

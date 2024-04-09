@@ -12,41 +12,58 @@ class App:
 class AppGUI(App):
     def __init__(self) -> None:
         self.root = tk.Tk()
-        self.root.title("AutoCAD External engineering networks")
-        self.root.geometry("600x200")
+
+        self.root.title("CAD EEN")
+        self.root.geometry("200x200")
+
+        self.root.call("source", "app/files/Theme/azure.tcl")
+        self.root.call("set_theme", "light")
+
+        self.root.resizable(False, False)
+
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+
+        icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
+        self.root.iconphoto(False, icon)
 
         self.frame_with_actions()
-        # self.frame_with_project_property()
 
         self.project = None
 
         self.root.mainloop()
 
     def frame_with_actions(self) -> None:
-        label_frame_actions_with_project = tk.LabelFrame(
+        label_frame_actions_with_project = ttk.LabelFrame(
             self.root,
-            text="Дії з проектом"
+            text="Дії з проектом",
+            padding=(10, 10)
         )
-        btb_create_project = ttk.Button(
+
+        menu_btb_project = ttk.Menubutton(
             label_frame_actions_with_project,
-            text="Новий проект",
+            text="Проект"
+        )
+        menu_btb_project.menu = tk.Menu(menu_btb_project)
+        menu_btb_project["menu"] = menu_btb_project.menu
+
+        menu_btb_project.menu.add_command(
+            label="Новий проект",
             command=self.command_create_project
         )
-        btb_create_project.pack()
-
-        label_frame_actions_with_project.grid(row=0, column=0)
-
-    def frame_with_project_property(self) -> None:
-        label_frame_project_properties = tk.LabelFrame(
-            self.root,
-            text="Дані проекту"
+        menu_btb_project.menu.add_command(
+            label="Відкрити проект",
+            command="OPEN PROJECT"
         )
-        label_2 = ttk.Label(label_frame_project_properties, text="Label 2",
-                            width=50)
+        menu_btb_project.grid(row=0, column=0, padx=10, pady=10, sticky="n")
 
-        label_2.pack()
-
-        label_frame_project_properties.grid(row=0, column=1)
+        label_frame_actions_with_project.grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="nsew"
+        )
 
     def command_create_project(self) -> None:
         CreateProjectGUI(self.root)
