@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from app.gui.create_project_gui import CreateProjectGUI
+from app.gui.create_project_gui import OpenProjectGUI
 from app.services.project_info import Project
 
 
@@ -53,7 +54,7 @@ class AppGUI(App):
         )
         menu_btb_project.menu.add_command(
             label="Відкрити проект",
-            command="OPEN PROJECT"
+            command=self.command_open_project
         )
         menu_btb_project.grid(row=0, column=0, padx=10, pady=10, sticky="n")
 
@@ -67,6 +68,9 @@ class AppGUI(App):
 
     def command_create_project(self) -> None:
         CreateProjectGUI(self.root)
+
+    def command_open_project(self) -> None:
+        OpenProjectGUI(self.root)
 
 
 class AppTerminal(App):

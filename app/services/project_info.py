@@ -29,7 +29,7 @@ class Project:
         self.path_to_project = None
         self.short_name = short_name
 
-    def add_json_info_file_project(self):
+    def add_json_info_file_project(self) -> None:
         json_info_file = json.dumps(self.property_template)
         file_path = os.path.join(self.path_to_project, "project_info.json")
         with open(file_path, "w", encoding="utf-8") as f:
@@ -107,6 +107,13 @@ class Project:
                     dwg_files.append(os.path.join(root, file))
         return dwg_files
 
+    @staticmethod
+    def path_to_json_project_files(path_to_project: str) -> str | bool:
+        path_to_json = os.path.join(path_to_project, "project_info.json")
+        if os.path.exists(path_to_json):
+            return path_to_json
+        return False
+
     def rename_file_dwg_for_new_project(self, path_to_project: str) -> None:
         dwg_files = self.path_to_all_dwg_project_files(path_to_project)
         for dwg_file in dwg_files:
@@ -137,6 +144,17 @@ class Project:
                 self.property_template[key] = value
         for key, value in self.property_template.items():
             print(f"\033[1m{key}\033[0m: {value}")
+
+    def open_exist_project(self) -> tuple[dict, str] | bool:
+        path_to_json = self.path_to_json_project_files(
+            self.choose_path_for_project()
+        )
+        if path_to_json:
+            with open(path_to_json, "r") as json_file:
+                project_properties = json.load(json_file)
+            dir_project = os.path.dirname(path_to_json)
+            return project_properties, dir_project
+        return False
 
     def get_all_project_info(self) -> dict:
         all_projects = {}

@@ -6,35 +6,40 @@ from tkinter import ttk
 from app.services.project_info import Project
 
 
-class CreateProjectGUI:
+class ProjectGUI:
     def __init__(self, root: tk.Tk) -> None:
         self.project = Project()
 
-        self.add_name_project_window = tk.Toplevel(root)
-        self.add_name_project_window.title("Введіть дані об'єкта")
+        self.project_property_window = tk.Toplevel(root)
+        self.project_property_window.title("Дані об'єкта")
 
         icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
-        self.add_name_project_window.iconphoto(False, icon)
+        self.project_property_window.iconphoto(False, icon)
 
-        self.add_name_project_window.grab_set()
+        self.project_property_window.grab_set()
+
+
+class CreateProjectGUI(ProjectGUI):
+    def __init__(self, root: tk.Tk) -> None:
+        super().__init__(root=root)
 
         self.short_name_project = self.create_fill_short_name()
         self.path_to_folder = self.create_fill_path_for_project()
 
         self.key_value_properties = self.create_fill_for_properties()
 
-        self.add_name_project_window.update_idletasks()
+        self.project_property_window.update_idletasks()
 
     def create_fill_short_name(self) -> tk.Entry:
         tk.Label(
-            self.add_name_project_window,
+            self.project_property_window,
             text="Коротка назва об'єкта"
         ).grid(row=0, column=0)
 
         short_name_project_var = tk.StringVar()
 
         short_name_entry_widget = tk.Entry(
-            self.add_name_project_window, bg="white",
+            self.project_property_window, bg="white",
             width=30,
             borderwidth=2,
             textvariable=short_name_project_var,
@@ -49,7 +54,7 @@ class CreateProjectGUI:
         path_to_folder_project_var = tk.StringVar()
 
         path_to_folder_project = tk.Entry(
-            self.add_name_project_window, bg="white",
+            self.project_property_window, bg="white",
             width=30,
             borderwidth=2,
             textvariable=path_to_folder_project_var,
@@ -61,11 +66,12 @@ class CreateProjectGUI:
             path_to_folder = self.project.choose_path_for_project()
             path_to_folder_project.insert(0, path_to_folder)
 
-        ttk.Button(
-            self.add_name_project_window,
+        btn_path = ttk.Button(
+            self.project_property_window,
             text="Вибрати",
             command=get_path_to_folder
-        ).grid(row=1, column=0, padx=5, pady=5)
+        )
+        btn_path.grid(row=1, column=0, padx=5, pady=5)
 
         return path_to_folder_project
 
@@ -82,7 +88,7 @@ class CreateProjectGUI:
             value_property_var = tk.StringVar()
 
             entry_key_property = tk.Entry(
-                self.add_name_project_window, bg="white",
+                self.project_property_window, bg="white",
                 width=25,
                 borderwidth=2,
                 textvariable=name_property_var,
@@ -90,7 +96,7 @@ class CreateProjectGUI:
             )
 
             entry_value_property = tk.Entry(
-                self.add_name_project_window, bg="white",
+                self.project_property_window, bg="white",
                 width=30,
                 borderwidth=2,
                 textvariable=value_property_var,
@@ -126,7 +132,7 @@ class CreateProjectGUI:
             entry_key_property.configure(state="disabled")
 
         ttk.Button(
-            self.add_name_project_window,
+            self.project_property_window,
             text="Створити",
             command=self.create_new_project
         ).grid(row=30, column=0, columnspan=2, padx=10, pady=10)
@@ -153,9 +159,13 @@ class CreateProjectGUI:
             return True
         return False
 
-    def message_window_creating_project(self) -> Toplevel:
-        message_window = tk.Toplevel(self.add_name_project_window)
-        message_window.title("Створюється проект")
+    def message_window_creating_project(
+            self,
+            title: str,
+            message: str
+    ) -> Toplevel:
+        message_window = tk.Toplevel(self.project_property_window)
+        message_window.title(title)
 
         icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
         message_window.iconphoto(False, icon)
@@ -165,9 +175,7 @@ class CreateProjectGUI:
 
         message_text = tk.Label(
             message_window,
-            text="Створюється проект.\n"
-                 "Це може зайняти декілька хвилин.\n"
-                 "Не вимикайте комп'ютер та не закривайте программу!",
+            text=message,
             justify="center"
         )
         message_text.grid(row=0, column=0, padx=10, pady=10)
@@ -176,7 +184,12 @@ class CreateProjectGUI:
 
     def create_new_project(self) -> None:
         if self.check_required_fields():
-            message = self.message_window_creating_project()
+            message = self.message_window_creating_project(
+                title="Створюється проект",
+                message="Створюється проект.\n"
+                        "Це може зайняти декілька хвилин.\n"
+                        "Не вимикайте комп'ютер та не закривайте программу!"
+            )
             message.grab_set()
             message.update()
 
@@ -196,10 +209,28 @@ class CreateProjectGUI:
             self.project.open_project_folder(self.project.path_to_project)
 
             message.destroy()
-            self.add_name_project_window.destroy()
+            self.project_property_window.destroy()
 
         else:
             messagebox.showwarning(
                 title="Помилка",
                 message="Необхідно заповнити всі обов'язкові поля"
             )
+
+
+class OpenProjectGUI(CreateProjectGUI):
+    def __init__(self, root: tk.Tk) -> None:
+        super().__init__(root)
+
+        self.key_value_properties = self.create_fill_for_properties()
+
+        self.project_property_window.update_idletasks()
+
+    def create_fill_for_properties(self) -> None | bool:
+        exist_project_property, dir_project = self.project.open_exist_project()
+
+        if exist_project_property:
+            self.project.property_template = exist_project_property
+            self.project.path_to_project = dir_project
+
+        return False
