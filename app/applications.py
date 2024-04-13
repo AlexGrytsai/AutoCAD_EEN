@@ -67,10 +67,10 @@ class AppGUI(App):
         )
 
     def command_create_project(self) -> None:
-        CreateProjectGUI(self.root)
+        CreateProjectGUI(self.root).create_project_window()
 
     def command_open_project(self) -> None:
-        OpenProjectGUI(self.root)
+        OpenProjectGUI(self.root).create_project_window()
 
 
 class AppTerminal(App):

@@ -23,10 +23,18 @@ class CreateProjectGUI(ProjectGUI):
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root=root)
 
+        self.short_name_project = None
+        self.path_to_folder = None
+        self.key_value_properties = None
+
+    def create_project_window(self) -> None:
         self.short_name_project = self.create_fill_short_name()
+
         self.path_to_folder = self.create_fill_path_for_project()
+        self.btn_path_to_folder(self.path_to_folder)
 
         self.key_value_properties = self.create_fill_for_properties()
+        self.btn_create_project()
 
         self.project_property_window.update_idletasks()
 
@@ -62,18 +70,19 @@ class CreateProjectGUI(ProjectGUI):
         )
         path_to_folder_project.grid(row=1, column=1)
 
+        return path_to_folder_project
+
+    def btn_path_to_folder(self, path_to_folder_project: tk.Entry) -> None:
         def get_path_to_folder() -> None:
             path_to_folder = self.project.choose_path_for_project()
+
             path_to_folder_project.insert(0, path_to_folder)
 
-        btn_path = ttk.Button(
+        ttk.Button(
             self.project_property_window,
             text="Вибрати",
             command=get_path_to_folder
-        )
-        btn_path.grid(row=1, column=0, padx=5, pady=5)
-
-        return path_to_folder_project
+        ).grid(row=1, column=0, padx=5, pady=5)
 
     def create_fill_for_properties(self) -> list[tuple[tk.Entry, tk.Entry]]:
         key_property = [key for key in self.project.property_template]
@@ -131,13 +140,14 @@ class CreateProjectGUI(ProjectGUI):
 
             entry_key_property.configure(state="disabled")
 
+        return entry_key_value_properties
+
+    def btn_create_project(self) -> None:
         ttk.Button(
             self.project_property_window,
             text="Створити",
             command=self.create_new_project
         ).grid(row=30, column=0, columnspan=2, padx=10, pady=10)
-
-        return entry_key_value_properties
 
     @staticmethod
     def clear_text_in_entry(
@@ -222,15 +232,12 @@ class OpenProjectGUI(CreateProjectGUI):
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
 
+        self.project.open_exist_project()
+
+    def create_project_window(self) -> None:
+        path_to_folder = self.create_fill_path_for_project()
+        path_to_folder.get()
+
         self.key_value_properties = self.create_fill_for_properties()
 
         self.project_property_window.update_idletasks()
-
-    def create_fill_for_properties(self) -> None | bool:
-        exist_project_property, dir_project = self.project.open_exist_project()
-
-        if exist_project_property:
-            self.project.property_template = exist_project_property
-            self.project.path_to_project = dir_project
-
-        return False

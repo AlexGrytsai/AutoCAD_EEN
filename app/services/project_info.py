@@ -153,7 +153,9 @@ class Project:
             with open(path_to_json, "r") as json_file:
                 project_properties = json.load(json_file)
             dir_project = os.path.dirname(path_to_json)
-            return project_properties, dir_project
+            self.property_template = project_properties
+            self.path_to_project = dir_project
+
         return False
 
     def get_all_project_info(self) -> dict:
