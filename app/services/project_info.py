@@ -1,5 +1,6 @@
 import os
 from shutil import copytree
+import json
 
 import easygui
 
@@ -28,16 +29,11 @@ class Project:
         self.path_to_project = None
         self.short_name = short_name
 
-    def get_all_project_info(self) -> dict:
-        all_projects = {}
-        for i in range(self.acad.si.NumCustomInfo()):
-            key = self.acad.si.GetCustomByIndex(i)[0]
-            value = self.acad.si.GetCustomByIndex(i)[1]
-            all_projects[key] = value
-        return all_projects
-
-    # TODO: Нужно переписать - перенести в Автокад
-    #  и сделать для выбраного файла
+    def add_json_info_file_project(self):
+        json_info_file = json.dumps(self.property_template)
+        file_path = os.path.join(self.path_to_project, "project_info.json")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(json_info_file)
 
     def write_user_property(self, key: str, value: str) -> None:
         opened_drawings = [drawing for drawing in self.acad.docs]
@@ -69,19 +65,6 @@ class Project:
                 self.acad.open_dwg(file_path)
         self.write_template_user_property()
 
-    def remove_property(self, property_name: str) -> None:
-        self.acad.doc.SummaryInfo.RemoveCustomByKey(property_name)
-
-    # TODO: Нужно чтобы открывались все чертежи проекта
-    #  и из них удалялось свойство
-
-    def remove_all_property(self) -> None:
-        for _ in range(self.acad.doc.SummaryInfo.NumCustomInfo()):
-            self.acad.doc.SummaryInfo.RemoveCustomByIndex(0)
-
-    # TODO: Нужно чтобы открывались все чертежи проекта и из них
-    #  удалялось свойство
-
     def write_template_user_property(self) -> None:
         self.write_all_property(**self.property_template)
 
@@ -89,7 +72,7 @@ class Project:
     def choose_path_for_project() -> str:
         return easygui.diropenbox(title="Виберіть місце для нового проекту")
 
-    def create_project_folder_with_template(
+    def create_project_folder_with_template_dwg(
             self,
             path_to_project: str | None = None
     ) -> None:
@@ -154,3 +137,27 @@ class Project:
                 self.property_template[key] = value
         for key, value in self.property_template.items():
             print(f"\033[1m{key}\033[0m: {value}")
+
+    def get_all_project_info(self) -> dict:
+        all_projects = {}
+        for i in range(self.acad.si.NumCustomInfo()):
+            key = self.acad.si.GetCustomByIndex(i)[0]
+            value = self.acad.si.GetCustomByIndex(i)[1]
+            all_projects[key] = value
+        return all_projects
+
+    # TODO: Нужно переписать - перенести в Автокад
+    #  и сделать для выбраного файла
+
+    def remove_property(self, property_name: str) -> None:
+        self.acad.doc.SummaryInfo.RemoveCustomByKey(property_name)
+
+    # TODO: Нужно чтобы открывались все чертежи проекта
+    #  и из них удалялось свойство
+
+    def remove_all_property(self) -> None:
+        for _ in range(self.acad.doc.SummaryInfo.NumCustomInfo()):
+            self.acad.doc.SummaryInfo.RemoveCustomByIndex(0)
+
+    # TODO: Нужно чтобы открывались все чертежи проекта и из них
+    #  удалялось свойство

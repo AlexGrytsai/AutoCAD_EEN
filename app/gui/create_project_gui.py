@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import Toplevel
 from tkinter import messagebox
+from tkinter import ttk
 
 from app.services.project_info import Project
 
@@ -14,6 +15,8 @@ class CreateProjectGUI:
 
         icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
         self.add_name_project_window.iconphoto(False, icon)
+
+        self.add_name_project_window.grab_set()
 
         self.short_name_project = self.create_fill_short_name()
         self.path_to_folder = self.create_fill_path_for_project()
@@ -150,20 +153,36 @@ class CreateProjectGUI:
             return True
         return False
 
+    def message_window_creating_project(self) -> Toplevel:
+        message_window = tk.Toplevel(self.add_name_project_window)
+        message_window.title("Створюється проект")
+
+        icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
+        message_window.iconphoto(False, icon)
+
+        message_window.resizable(width=False, height=False)
+        message_window.geometry("350x100+200+200")
+
+        message_text = tk.Label(
+            message_window,
+            text="Створюється проект.\n"
+                 "Це може зайняти декілька хвилин.\n"
+                 "Не вимикайте комп'ютер та не закривайте программу!",
+            justify="center"
+        )
+        message_text.grid(row=0, column=0, padx=10, pady=10)
+
+        return message_window
+
     def create_new_project(self) -> None:
         if self.check_required_fields():
-            # messagebox.showinfo(title="Create the new project",
-            #                     message="Створюється новий проект.\n"
-            #                             "Це може зайняти декілька хвилин.\n"
-            #                             "!!Не вимикайте комп'ютер та зупиняйте"
-            #                             " программу!!")
-            # TODO: Need to make simple window with message about create the new project. This window must be destroy after finished create
+            message = self.message_window_creating_project()
+            message.grab_set()
+            message.update()
 
             self.project.short_name = self.short_name_project.get()
-
             self.get_all_user_properties()
-
-            self.project.create_project_folder_with_template(
+            self.project.create_project_folder_with_template_dwg(
                 self.path_to_folder.get()
             )
 
@@ -172,7 +191,13 @@ class CreateProjectGUI:
             )
             self.project.write_template_project_info(dwg_files)
 
+            self.project.add_json_info_file_project()
+
             self.project.open_project_folder(self.project.path_to_project)
+
+            message.destroy()
+            self.add_name_project_window.destroy()
+
         else:
             messagebox.showwarning(
                 title="Помилка",

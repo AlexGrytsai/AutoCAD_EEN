@@ -115,7 +115,7 @@ class AppTerminal(App):
         short_name = input("\033[1mВведіть коротку назву:\033[0m ").lower()
 
         project = Project(short_name)
-        project.create_project_folder_with_template()
+        project.create_project_folder_with_template_dwg()
 
         commands = {
             "0": "так",
