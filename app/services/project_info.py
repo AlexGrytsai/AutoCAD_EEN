@@ -4,7 +4,7 @@ import json
 
 import easygui
 
-from app.autocad import Autocad
+from app.services.autocad import Autocad
 
 
 class Project:

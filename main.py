@@ -1,5 +1,5 @@
 # AutoCAD External engineering networks
-from app.applications import AppGUI
+from app.gui.applications import AppGUI
 
 if __name__ == '__main__':
     AppGUI()

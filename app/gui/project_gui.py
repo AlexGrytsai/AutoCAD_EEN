@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import Toplevel
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter.ttk import Button
 
 from app.services.project_info import Project
 
@@ -12,7 +13,7 @@ class ProjectGUI:
         self.project = Project()
 
         self.project_property_window = tk.Toplevel(root)
-        self.project_property_window.title("Дані об'єкта")
+        self.project_property_window.title("Дані проекта")
 
         icon = tk.PhotoImage(file="app/files/Theme/auto-cad.png")
         self.project_property_window.iconphoto(False, icon)
@@ -83,7 +84,8 @@ class CreateProjectGUI(ProjectGUI):
         ttk.Button(
             self.project_property_window,
             text="Вибрати",
-            command=get_path_to_folder
+            command=get_path_to_folder,
+            style="Accent.TButton"
         ).grid(row=1, column=0, padx=5, pady=5)
 
     def create_fill_for_properties(self) -> list[tuple[tk.Entry, tk.Entry]]:
@@ -144,12 +146,16 @@ class CreateProjectGUI(ProjectGUI):
 
         return entry_key_value_properties
 
-    def btn_create_project(self) -> None:
-        ttk.Button(
+    def btn_create_project(self) -> Button:
+        btn_create_project = ttk.Button(
             self.project_property_window,
-            text="Ok",
-            command=self.create_new_project
-        ).grid(row=30, column=0, padx=10, pady=10)
+            text="Створити",
+            command=self.create_new_project,
+            style="Accent.TButton"
+        )
+        btn_create_project.grid(row=30, column=1, padx=10, pady=10)
+
+        return btn_create_project
 
     def btn_cancel_create(self) -> None:
         def cancel_create() -> None:
@@ -157,9 +163,9 @@ class CreateProjectGUI(ProjectGUI):
 
         ttk.Button(
             self.project_property_window,
-            text="Cancel",
-            command=cancel_create
-        ).grid(row=30, column=1, padx=10, pady=10)
+            text="Скасувати",
+            command=cancel_create,
+        ).grid(row=30, column=0, padx=10, pady=10)
 
     @staticmethod
     def clear_text_in_entry(
@@ -169,12 +175,12 @@ class CreateProjectGUI(ProjectGUI):
         if entry.get() in template_list_property:
             entry.delete(0, tk.END)
 
-    def get_all_user_properties(self) -> None:
+    def get_all_user_properties(self) -> dict[str, str]:
         user_properties = {}
         for property in self.key_value_properties:
             key, value = property
             user_properties[key.get()] = value.get()
-        self.project.property_template = user_properties
+        return user_properties
 
     def check_required_fields(self) -> bool:
         if self.short_name_project.get() and self.path_to_folder.get():
@@ -216,7 +222,8 @@ class CreateProjectGUI(ProjectGUI):
             message.update()
 
             self.project.short_name = self.short_name_project.get()
-            self.get_all_user_properties()
+            self.project.property_template = self.get_all_user_properties()
+
             self.project.create_project_folder_with_template_dwg(
                 self.path_to_folder.get()
             )
@@ -266,6 +273,12 @@ class OpenProjectGUI(CreateProjectGUI):
 
         self.btn_cancel_create()
 
+        btn_rewrite_property = self.btn_create_project()
+        btn_rewrite_property.configure(
+            text="Змінити",
+            command=self.rewrite_properties
+        )
+
     def unbind_entry_value_properties(self) -> None:
         for property in self.key_value_properties:
             key, value = property
@@ -275,3 +288,29 @@ class OpenProjectGUI(CreateProjectGUI):
         tk.Label(
             self.project_property_window, text="Розташування проекту"
         ).grid(row=1, column=0, padx=10, pady=10)
+
+    def rewrite_properties(self) -> None:
+        new_properties = self.get_all_user_properties()
+        if new_properties != self.project.property_template:
+            message = self.message_window_creating_project(
+                title="Зміна данних проекту",
+                message="Змінюються дані проекту.\n"
+                        "Це може зайняти декілька хвилин.\n"
+                        "Не вимикайте комп'ютер та не закривайте программу!"
+            )
+            message.grab_set()
+            message.update()
+
+            self.project.property_template = new_properties
+
+            dwg_files = self.project.path_to_all_dwg_project_files(
+                self.project.path_to_project
+            )
+            self.project.write_template_project_info(dwg_files)
+
+            self.project.add_json_info_file_project()
+
+            message.destroy()
+            self.project_property_window.destroy()
+        else:
+            messagebox.showinfo(title="Info", message="Ви не внесли жодних змін.")

@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
-from app.gui.create_project_gui import CreateProjectGUI
-from app.gui.create_project_gui import OpenProjectGUI
+from app.gui.project_gui import CreateProjectGUI
+from app.gui.project_gui import OpenProjectGUI
 from app.services.project_info import Project
 
 
