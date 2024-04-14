@@ -1,3 +1,4 @@
+import win32com
 from win32com.client import Dispatch
 from win32com.client import CDispatch
 
@@ -9,12 +10,20 @@ class Autocad:
     db = acad.ActiveDocument.Database
     si = db.SummaryInfo
 
+    @staticmethod
+    def check_install_autocad() -> bool:
+        try:
+            win32com.client.Dispatch("AutoCAD.Application")
+            return True
+        except Exception:
+            return False
+    # TODO: Need to add a check or installed AutoCAD before execution
+
     def open_dwg(self, address_file: str) -> None:
         if self.acad.Preferences.System.SingleDocumentMode:
             self.acad.ActiveDocument.Open(address_file)
         else:
             self.acad.Documents.Open(address_file)
-
 
     @staticmethod
     def quick_save_dwg(drawing: CDispatch) -> None:
@@ -62,3 +71,5 @@ class Autocad:
             property_name: str
     ) -> None:
         drawing.SummaryInfo.RemoveCustomByKey(property_name)
+
+Autocad().check_install_autocad()

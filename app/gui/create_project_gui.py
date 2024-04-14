@@ -1,3 +1,4 @@
+import os.path
 import tkinter as tk
 from tkinter import Toplevel
 from tkinter import messagebox
@@ -35,6 +36,7 @@ class CreateProjectGUI(ProjectGUI):
 
         self.key_value_properties = self.create_fill_for_properties()
         self.btn_create_project()
+        self.btn_cancel_create()
 
         self.project_property_window.update_idletasks()
 
@@ -145,9 +147,19 @@ class CreateProjectGUI(ProjectGUI):
     def btn_create_project(self) -> None:
         ttk.Button(
             self.project_property_window,
-            text="Створити",
+            text="Ok",
             command=self.create_new_project
-        ).grid(row=30, column=0, columnspan=2, padx=10, pady=10)
+        ).grid(row=30, column=0, padx=10, pady=10)
+
+    def btn_cancel_create(self) -> None:
+        def cancel_create() -> None:
+            self.project_property_window.destroy()
+
+        ttk.Button(
+            self.project_property_window,
+            text="Cancel",
+            command=cancel_create
+        ).grid(row=30, column=1, padx=10, pady=10)
 
     @staticmethod
     def clear_text_in_entry(
@@ -181,7 +193,7 @@ class CreateProjectGUI(ProjectGUI):
         message_window.iconphoto(False, icon)
 
         message_window.resizable(width=False, height=False)
-        message_window.geometry("350x100+200+200")
+        message_window.update_idletasks()
 
         message_text = tk.Label(
             message_window,
@@ -235,9 +247,31 @@ class OpenProjectGUI(CreateProjectGUI):
         self.project.open_exist_project()
 
     def create_project_window(self) -> None:
+        short_name_project = self.create_fill_short_name()
+        short_name_project.insert(
+            0, os.path.basename(
+                os.path.normpath(self.project.path_to_project)
+            )
+        )
+        short_name_project.configure(state="disabled")
+
+        self.label_path_to_project()
         path_to_folder = self.create_fill_path_for_project()
-        path_to_folder.get()
+        path_to_folder.insert(0, self.project.path_to_project)
 
         self.key_value_properties = self.create_fill_for_properties()
+        self.unbind_entry_value_properties()
 
         self.project_property_window.update_idletasks()
+
+        self.btn_cancel_create()
+
+    def unbind_entry_value_properties(self) -> None:
+        for property in self.key_value_properties:
+            key, value = property
+            value.unbind("<FocusIn>")
+
+    def label_path_to_project(self) -> None:
+        tk.Label(
+            self.project_property_window, text="Розташування проекту"
+        ).grid(row=1, column=0, padx=10, pady=10)
