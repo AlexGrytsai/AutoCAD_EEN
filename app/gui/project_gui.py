@@ -30,6 +30,15 @@ class CreateProjectGUI(ProjectGUI):
         self.key_value_properties = None
 
     def create_project_window(self) -> None:
+        """
+        Creates the project window and initializes the necessary components.
+        This function is responsible for creating the project window and
+        initializing the required components for the project.
+        Parameters:
+            self (CreateProjectGUI): The instance of the `CreateProjectGUI` class.
+        Returns:
+            None
+        """
         self.short_name_project = self.create_fill_short_name()
 
         self.path_to_folder = self.create_fill_path_for_project()
@@ -42,6 +51,14 @@ class CreateProjectGUI(ProjectGUI):
         self.project_property_window.update_idletasks()
 
     def create_fill_short_name(self) -> tk.Entry:
+        """
+        Creates a tkinter Entry widget for the short name of an object
+        and returns it.
+
+        :return: A tkinter Entry widget for the short name of an object.
+        :rtype: tk.Entry
+        """
+
         tk.Label(
             self.project_property_window,
             text="Коротка назва об'єкта"
@@ -61,6 +78,13 @@ class CreateProjectGUI(ProjectGUI):
         return short_name_entry_widget
 
     def create_fill_path_for_project(self) -> tk.Entry:
+        """
+        Creates a tkinter Entry widget for the path to the project folder
+        and returns it.
+
+        :return: A tkinter Entry widget for the path to the project folder.
+        :rtype: tk.Entry
+        """
 
         path_to_folder_project_var = tk.StringVar()
 
@@ -76,6 +100,16 @@ class CreateProjectGUI(ProjectGUI):
         return path_to_folder_project
 
     def btn_path_to_folder(self, path_to_folder_project: tk.Entry) -> None:
+        """
+        Creates a button that, when clicked, retrieves the path to a folder
+        and inserts it into the provided tk.Entry widget.
+
+        :param path_to_folder_project: A tk.Entry widget to insert the path
+        to the folder.
+        :type path_to_folder_project: tk.Entry
+        :return: None
+        :rtype: None
+        """
         def get_path_to_folder() -> None:
             path_to_folder = self.project.choose_path_for_project()
 
@@ -89,6 +123,14 @@ class CreateProjectGUI(ProjectGUI):
         ).grid(row=1, column=0, padx=5, pady=5)
 
     def create_fill_for_properties(self) -> list[tuple[tk.Entry, tk.Entry]]:
+        """
+        Creates and configures tkinter Entry widgets for the key-value
+        properties of the project.
+
+        :return: A list of tuples containing the Entry widgets for the key
+        and value properties.
+        :rtype: list[tuple[tk.Entry, tk.Entry]]
+        """
         key_property = [key for key in self.project.property_template]
         value_property = [
             value for value in self.project.property_template.values()
@@ -147,6 +189,12 @@ class CreateProjectGUI(ProjectGUI):
         return entry_key_value_properties
 
     def btn_create_project(self) -> Button:
+        """
+        Creates a button that, when clicked, triggers the creation of a new project.
+
+        :return: The created button widget.
+        :rtype: Button
+        """
         btn_create_project = ttk.Button(
             self.project_property_window,
             text="Створити",
@@ -172,10 +220,29 @@ class CreateProjectGUI(ProjectGUI):
             entry: tk.Entry,
             template_list_property: list[str]
     ) -> None:
+        """
+        Clears the text in the given tkinter Entry widget if it matches any
+        of the strings in the provided list.
+
+        :param entry: The tkinter Entry widget to clear the text from.
+        :type entry: tk.Entry
+        :param template_list_property: A list of strings to check against the
+        text in the Entry widget.
+        :type template_list_property: list[str]
+        :return: None
+        :rtype: None
+        """
         if entry.get() in template_list_property:
             entry.delete(0, tk.END)
 
     def get_all_user_properties(self) -> dict[str, str]:
+        """
+        A function that retrieves all user properties from the key-value
+        properties.
+
+        Returns:
+            dict[str, str]: A dictionary containing the user properties.
+        """
         user_properties = {}
         for property in self.key_value_properties:
             key, value = property
@@ -183,15 +250,34 @@ class CreateProjectGUI(ProjectGUI):
         return user_properties
 
     def check_required_fields(self) -> bool:
+        """
+        Check if both the short name project and the path to the folder
+        have values.
+
+        Returns:
+            bool: True if both short name project and path to the folder
+            have values, False otherwise.
+        """
         if self.short_name_project.get() and self.path_to_folder.get():
             return True
         return False
 
-    def message_window_creating_project(
+    def message_window(
             self,
             title: str,
             message: str
     ) -> Toplevel:
+        """
+        Creates a new message window with the given title and message.
+
+        :param title: The title of the message window.
+        :type title: str
+        :param message: The message to be displayed in the message window.
+        :type message: str
+        :return: The newly created message window.
+        :rtype: Toplevel
+        """
+
         message_window = tk.Toplevel(self.project_property_window)
         message_window.title(title)
 
@@ -211,8 +297,15 @@ class CreateProjectGUI(ProjectGUI):
         return message_window
 
     def create_new_project(self) -> None:
+        """
+        A function that creates a new project, populates the necessary project
+        details, creates the project folder with a template DWG file, writes
+        project information, adds a JSON info file, and opens the project
+        folder. If required fields are not filled, it shows a warning message.
+        """
+
         if self.check_required_fields():
-            message = self.message_window_creating_project(
+            message = self.message_window(
                 title="Створюється проект",
                 message="Створюється проект.\n"
                         "Це може зайняти декілька хвилин.\n"
@@ -248,12 +341,22 @@ class CreateProjectGUI(ProjectGUI):
 
 
 class OpenProjectGUI(CreateProjectGUI):
+    """
+    This class represents the GUI for opening an existing project.
+    It inherits from the CreateProjectGUI class.
+    """
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
 
         self.project.open_exist_project()
 
     def create_project_window(self) -> None:
+        """
+        Creates the project window and initializes the necessary components.
+        This function is responsible for creating the project window and
+        initializing the required components for the project.
+        """
+
         short_name_project = self.create_fill_short_name()
         short_name_project.insert(
             0, os.path.basename(
@@ -280,19 +383,44 @@ class OpenProjectGUI(CreateProjectGUI):
         )
 
     def unbind_entry_value_properties(self) -> None:
+        """
+        Unbinds the "<FocusIn>" event from the value Entry widgets in the
+        key-value properties.
+        This function iterates over each key-value property in
+        `self.key_value_properties` and unbinds the "<FocusIn>" event from
+        the value Entry widget. This is done by calling the `unbind` method on
+        the value Entry widget and passing "<FocusIn>" as the event to unbind.
+        """
+
         for property in self.key_value_properties:
             key, value = property
             value.unbind("<FocusIn>")
 
     def label_path_to_project(self) -> None:
+        """
+        Creates a tkinter Label widget with the text "Розташування проекту" and
+        grids it in the project property window at row 1, column 0 with
+        10 pixels of padding on the x-axis and y-axis.
+        """
+
         tk.Label(
             self.project_property_window, text="Розташування проекту"
         ).grid(row=1, column=0, padx=10, pady=10)
 
     def rewrite_properties(self) -> None:
+        """
+        This function checks if the new user properties are different from
+        the existing project properties. If they are different, it displays
+        a message to the user and updates the project properties.
+        It then updates the project information in all the DWG files,
+        adds a JSON info file to the project, and closes the project property
+        window. If the new properties are the same as the existing properties,
+        it displays an info message to the user.
+        """
+
         new_properties = self.get_all_user_properties()
         if new_properties != self.project.property_template:
-            message = self.message_window_creating_project(
+            message = self.message_window(
                 title="Зміна данних проекту",
                 message="Змінюються дані проекту.\n"
                         "Це може зайняти декілька хвилин.\n"
@@ -313,4 +441,5 @@ class OpenProjectGUI(CreateProjectGUI):
             message.destroy()
             self.project_property_window.destroy()
         else:
-            messagebox.showinfo(title="Info", message="Ви не внесли жодних змін.")
+            messagebox.showinfo(title="Info",
+                                message="Ви не внесли жодних змін.")

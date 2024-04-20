@@ -7,10 +7,12 @@ from app.services.project_info import Project
 
 
 class App:
+    """Base class representing an application."""
     pass
 
 
 class AppGUI(App):
+    """Class representing the GUI for the CAD EEN application."""
     def __init__(self) -> None:
         self.root = tk.Tk()
 
@@ -35,6 +37,19 @@ class AppGUI(App):
         self.root.mainloop()
 
     def frame_with_actions(self) -> None:
+        """
+        Creates a label frame with actions related to the project and adds it
+        to the root window.
+        This function creates a label frame with the text "Дії з проектом"
+        and adds it to the root window. It also creates a menubutton with the
+        text "Проект" and adds it to the label frame. The menubutton has
+        a menu with two commands: "Новий проект" and "Відкрити проект".
+        Each command is associated with a corresponding callback function:
+        `self.command_create_project` and `self.command_open_project`
+        respectively. The menubutton and label frame are then grid-packed
+        in the root window.
+        """
+
         label_frame_actions_with_project = ttk.LabelFrame(
             self.root,
             text="Дії з проектом",
@@ -67,13 +82,29 @@ class AppGUI(App):
         )
 
     def command_create_project(self) -> None:
+        """
+        A method that triggers the creation of a new project window.
+        It initializes the CreateProjectGUI class with the root window
+        and calls the create_project_window method.
+        """
+
         CreateProjectGUI(self.root).create_project_window()
 
     def command_open_project(self) -> None:
+        """
+        A method that triggers the creation of a new project window.
+        It initializes the OpenProjectGUI class with the root window and calls
+        the create_project_window method.
+        """
+
         OpenProjectGUI(self.root).create_project_window()
 
 
 class AppTerminal(App):
+    """
+    Class representing a terminal application.
+    This class inherits from the App class.
+    """
 
     @staticmethod
     def print_start_massage() -> None:
@@ -116,6 +147,30 @@ class AppTerminal(App):
             print(f"\033[1m[{key}]:\033[0m {value.title()}")
 
     def create_new_project(self):
+        """
+        Creates a new project.
+        This function prompts the user to enter a short name for the project.
+        It then creates a new instance of the Project class with the entered
+        short name and calls the create_project_folder_with_template_dwg
+        method to create a project folder with a template DWG file.
+
+        After that, it displays a menu asking the user if they want to fill in
+        the project data. The user can enter either "0" or "1" to respond.
+        If the user enters "0", the project.take_from_user_project_info method
+        is called to fill in the project data.
+
+        The function then retrieves the paths to all DWG files in the project
+        folder using the path_to_all_dwg_project_files method of the project
+        instance. It displays a message indicating that the project is being
+        created and calls the write_template_project_info method of the project
+        instance to write project information to the DWG files. Finally, it
+        calls the open_project_folder method of the project instance to open
+        the project folder.
+
+        If the user enters an invalid command, the function displays an error
+        message and prompts the user to enter a valid command.
+        """
+
         short_name = input("\033[1mВведіть коротку назву:\033[0m ").lower()
 
         project = Project(short_name)
@@ -150,6 +205,11 @@ class AppTerminal(App):
             break
 
     def user_action(self):
+        """
+        This function prompts the user for a command and performs different
+        actions based on the command.
+        """
+
         self.print_start_massage()
 
         commands = {
