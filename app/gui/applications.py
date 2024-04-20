@@ -16,8 +16,8 @@ class AppGUI(App):
     def __init__(self) -> None:
         self.root = tk.Tk()
 
-        self.root.title("CAD EEN")
-        self.root.geometry("200x200")
+        self.root.title("AutoCAD External engineering networks")
+        self.root.geometry("380x150")
 
         self.root.call("source", "app/files/Theme/azure.tcl")
         self.root.call("set_theme", "light")
@@ -53,11 +53,12 @@ class AppGUI(App):
         label_frame_actions_with_project = ttk.LabelFrame(
             self.root,
             text="Дії з проектом",
-            padding=(10, 10)
+            padding=(10, 10),
+
         )
 
         menu_btb_project = ttk.Menubutton(
-            label_frame_actions_with_project,
+            self.root,
             text="Проект"
         )
         menu_btb_project.menu = tk.Menu(menu_btb_project)
@@ -71,15 +72,15 @@ class AppGUI(App):
             label="Відкрити проект",
             command=self.command_open_project
         )
-        menu_btb_project.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+        menu_btb_project.grid(row=0, column=0, padx=30, pady=30, sticky="nsew")
 
-        label_frame_actions_with_project.grid(
-            row=0,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="nsew"
-        )
+        # label_frame_actions_with_project.grid(
+        #     row=0,
+        #     column=0,
+        #     padx=10,
+        #     pady=10,
+        #     sticky="nsew"
+        # )
 
     def command_create_project(self) -> None:
         """

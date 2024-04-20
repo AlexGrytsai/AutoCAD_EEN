@@ -7,7 +7,8 @@ from app.services.autocad import Autocad
 
 def main():
     """
-    This function checks if AutoCAD is installed on the system and runs the GUI application if it is.
+    This function checks if AutoCAD is installed on the system and runs the
+    GUI application if it is.
     """
 
     if Autocad.check_install_autocad():
